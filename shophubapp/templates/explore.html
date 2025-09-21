@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block user-info %}
+
+{% endblock %}
+
+ {% block content %}
+    <br><br>
+
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Explore All Lists</h1>
+            <button type="button" class="btn btn-primary custom-btn" data-toggle="modal" data-target="#createListModal">
+                Create a New List
+            </button>
+        </div>
+        </div>
+        <br><br>
+
+        <div class="modal fade" id="createListModal" tabindex="-1" aria-labelledby="createListModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createListModalLabel">Create a New List</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="createListForm" method="post" action="{% url 'create_list' %}">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <input type="hidden" name="redirect_to" value="explore">
+                            <button type="submit" class="btn btn-primary custom-btn">Create List</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            setInterval(getAllLists, 1000);
+            getAllLists(); 
+            const starListURL = function (id) {
+                return "{% url 'star_list' 0 %}".replace("0", id);
+            };
+            const removeStarListURL = function (id) {
+                return "{% url 'remove_star_list' 0 %}".replace("0", id);
+            };
+
+        </script>
+
+        <div id="global-lists-container">
+            <div id="list-container" class="row">
+            </div>
+</div> 
+
+{% endblock %}

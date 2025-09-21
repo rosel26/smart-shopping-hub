@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block user-info %}
+
+{% endblock %}
+
+ {% block content %}
+    <div class = "container mt-5">
+        <div class = "row justify-content-center">
+            <div class="col-md-8 text-center">
+                <h1 id="id_page_name" class="mb-4">
+                    {{ profile.user.first_name }} {{ profile.user.last_name }}
+                </h1>
+                <div id="other_username" class="h5 text-muted">{{ profile.user.username }}</div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-6">
+                <div id="friend_div" class="text-center mb-3">
+                </div>
+                <ul id="friendRequestList" class="list-group">
+                </ul>
+            </div>
+        </div>
+
+
+        <div class = "row">
+            {% for list in lists %}
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Left column for name and date -->
+                            <div class="col-8">
+                                <h5 class="card-title">
+                                    <a href="{% url 'list' list.id %}">{{ list.name }}</a>
+                                </h5>
+                                <p class="card-text"><small class="text-muted">Created on: {{ list.created_at }} </small></p>
+                                <p><a href="/shophubapp/other_profile/{{ list.user_id }}/">{{ list.user }}</a> </small></p>
+
+                            </div>
+    
+                            <!-- Right column for image -->
+                            <div class="col-4">
+                                {% if list.get_first_product_image_url %}
+                                    <img src="{{ list.get_first_product_image_url }}" alt="Product Image" class="img-fluid" style="max-width: 80%;">
+                                {% endif %}
+                            </div>
+                        </div>
+    
+                        <p class="card-text">{{ list.description }}</p>
+                        
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script src="/shophubapp/static/other_profile.js"></script>
+{% endblock %}

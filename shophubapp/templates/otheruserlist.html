@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block user-info %}
+
+{% endblock %}
+
+ {% block content %}
+
+ <br><br>
+    <div class = "container">
+            <div class="d-flex align-items-center justify-content-between position-relative">
+            <a href="{% url 'explore' %}" class="btn btn-primary custom-btn btn-back position-absolute start-0">
+                Back to Explore
+            </a>
+            <h1 class="text-center" id="id_page_name">{{ list_name }}</h1>
+            <div id="total"></div>
+            <form id="collaborationForm" action="{% url 'add_collaborator' user_list.id %}" method="post">
+                {% csrf_token %}
+                <div id = "divRequestButton">
+                    {% if pending_request %}
+                        <button id="requestButton" type="button" class="btn btn-secondary custom-btn" disabled>Request to Collaborate Sent</button>
+                    {% else %}
+                        <button id="requestButton" onclick = requestSent() type="button" class="btn btn-primary custom-btn">Request to Collaborate</button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <br><br>
+    </div> 
+
+
+    <script>
+        const list_id = "{{list_id}}"
+        setInterval(getProducts, 1000);
+        getListsRestrict(list_id)
+        getProductsRestrict(list_id)
+    </script>
+
+    <script>
+        // Add  event listener for the Request to Collaborate button
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("DOMContentLoaded: Setting up the event listener.");
+
+            const requestButton = document.getElementById("requestButton");
+            const form = document.getElementById("collaborationForm");
+
+            if (requestButton && form) {
+                console.log("Button and form found in the DOM.");
+                requestButton.addEventListener("click", function (event) {
+                    console.log("clicked.");
+                    requestButton.style.color = "#808080";
+                    event.preventDefault(); 
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.open("POST", form.action, true);
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token }}");
+                    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+                    xhr.onload = function () {
+                        console.log("AJAX request sent. Response status:", xhr.status);
+                        if (xhr.status === 200) {
+                            const response = JSON.parse(xhr.responseText);
+                            console.log("AJAX response:", response);
+                            if (response.status === "success") {
+                                requestSent()
+                            } else if (response.status === "info") {
+                                alert(response.message);
+                            }
+                        } else {
+                            console.error("Request failed with status: " + xhr.status);
+                        }
+                    };
+
+                    xhr.onerror = function () {
+                        console.error("AJAX request failed.");
+                    };
+
+                    const data = new URLSearchParams();
+                    data.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+                    xhr.send(data.toString());
+                });
+            } else {
+                console.error("Button or form not found in the DOM.");
+            }
+        });
+    </script>
+
+    <div id="global-products-container">
+        <div id="product-list-container" class="row">
+        </div>
+    </div> 
+<br><br>
+
+{% endblock %}

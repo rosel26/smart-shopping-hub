@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<br></br>
+
+<div class = "container">
+    <div class="d-flex justify-content-center align-items-center">
+        <h1>Notifications</h1>
+
+    </div>
+</div>
+
+<br></br>
+
+<h3 class="text-center mb-3">Collaboration Requests</h3>
+<ul>
+    <ul class = "list-group-c">
+        {% for notification in notifications %}
+            {% if notification.accepted %}
+            {% else %}
+            <div class="collaboration-box">
+                <div>
+            <p>
+                <strong>{{ notification.sender.username }}</strong> has sent you a collaboration request for 
+                    <a href="/shophubapp/list/{{notification.content_object.id}}/">{{ notification.content_object.name }}</a>
+            </p>
+            <small class="text-muted">Sent: {{ notification.timestamp|date:"F j, Y, g:i a" }}</small>
+            </div>
+            <div>
+                <br>
+                <form action="{% url 'accept_collaboration' notification.id %}" method="post" class="d-inline" id="accept-form-{{ notification.id }}">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-success btn-sm" id="accept-button-{{ notification.id }}" onclick="submitForm({{ notification.id }})">Accept</button>
+                </form>
+            </li>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</ul>
+<script>
+    function submitForm(notificationId) {
+        // Find the form element by its id
+        var form = document.getElementById('accept-form-' + notificationId);
+        
+        // Submit the form
+        form.submit();
+    }
+</script>
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8">
+        <h3 class="text-center mb-3">Friend Requests</h3>
+        <ul id="friendRequestList" class="list-group">
+        </ul>
+    </div>
+</div>
+
+
+<script>
+    window.onload = renderRequests;
+    window.setInterval(renderRequests, 500);
+</script>  
+
+
+{% endblock %}

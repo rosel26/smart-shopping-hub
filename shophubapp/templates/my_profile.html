@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block user-info %}
+
+{% endblock %}
+
+ {% block content %}
+
+    <div class="container mt-4=">
+    <div class="text-center">
+        <br><br>
+        <h1 id="id_page_name" class="display-4">{{ user.first_name }} {{ user.last_name }}</h1>
+        <img id="id_user_picture" class="rounded-circle my-3" src="{{ request.session.picture }}" alt="Profile Picture" style="height: 5em;">
+    </div>
+    
+    <br><br>
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>My Lists</h2> <br><br>
+            <button type="button" class="btn btn-primary custom-btn" data-toggle="modal" data-target="#createListModal">
+                Create a New List
+            </button>
+        </div>
+        <br>
+
+        <div class="modal fade" id="createListModal" tabindex="-1" aria-labelledby="createListModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createListModalLabel">Create a New List</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="createListForm" method="post" action="{% url 'create_list' %}">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <input type="hidden" name="redirect_to" value="profile">
+                            <button type="submit" class="btn btn-primary custom-btn">Create List</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            {% for user_list in user_lists %}
+            <div class="col-md-4 col-sm-6 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- left column for name and date -->
+                            <div class="col-8">
+                                <h5 class="card-title">
+                                    <a href="{% url 'list' user_list.id %}">{{ user_list.name }}</a>
+                                </h5>
+                                <p class="card-text"><small class="text-muted">Created on: {{ user_list.created_at }} </small></p>
+                                <p><a href="/shophubapp/other_profile/{{ user_list.user_id }}/">{{ user_list.user }}</a> </small></p>
+
+                            </div>
+    
+                            <!-- right column for image -->
+                            <div class="col-4">
+                                {% if user_list.get_first_product_image_url %}
+                                    <img src="{{ user_list.get_first_product_image_url }}" alt="Product Image" class="img-fluid" style="max-width: 80%;">
+                                {% endif %}
+                            </div>
+                        </div>
+    
+                        <p class="card-text">{{ user_list.description }}</p>
+    
+                        <!-- delete "x" inside the card -->
+                        <form action="{% url 'delete_list' user_list.id %}" method="post" class="delete-form">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm delete-btn" aria-label="Delete">
+                                ×
+                            </button>
+                        </form>
+                        
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    
+
+    </form>
+    <br><br>
+
+    <h3>My Friends</h3>
+    <ul class="list-group mt-3">
+        <div class="list-group-item" id="friendsList"></div><br>
+        <div class="list-group-item text-muted" id="noFriendsMessage">No users followed yet.</div>
+    </ul>
+
+    <br><br><br>
+
+    <h3>Outgoing Link Click Stats</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>URL</th>
+                <th>Clicks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stat in click_stats %}
+            <tr>
+                <td>{{ stat.url }}</td>
+                <td>{{ stat.total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    <br><br>
+
+    <script>
+        window.onload = renderFriendsList;
+        window.setInterval(renderFriendsList, 3000);
+    </script>
+        
+{% endblock %}

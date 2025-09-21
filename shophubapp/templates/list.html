@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+    {% load static %}
+    <link href="{% static 'list.css' %}" rel="stylesheet" type="text/css">
+
+{% block user-info %}
+
+{% endblock %}
+
+ {% block content %}
+
+ <br><br>
+    <div class = "container" id="custom-padding">
+        <div class="position-relative">
+            <a href="{% url 'explore' %}" class="btn btn-primary custom-btn btn-back position-absolute start-0">
+                Back to Explore
+            </a>
+        
+            <h1 class="text-center" id="id_page_name">{{ list_name }}</h1>
+        </div>
+        <div class="row align-items-center">
+            <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap">
+                <form method="get" id="sortForm" class="d-flex align-items-center">
+                    <label for="sort" class="me-2 fw-bold">Sort by:</label>
+                    <select name="sort" id="sort" class="form-select form-select-lg rounded-pill" 
+                        style="max-width: 250px; background-color: #f8f9fa; border: 1px solid #ced4da;" 
+                        onchange="document.getElementById('sortForm').submit()">
+                        <option value="added_at" {% if current_sort == "added_at" %}selected{% endif %}>Date Added (Old to New)</option>
+                        <option value="-added_at" {% if current_sort == "-added_at" %}selected{% endif %}>Date Added (New to Old)</option>
+                        <option value="name" {% if current_sort == "name" %}selected{% endif %}>Name (A-Z)</option>
+                        <option value="-name" {% if current_sort == "-name" %}selected{% endif %}>Name (Z-A)</option>
+                        <option value="price" {% if current_sort == "price" %}selected{% endif %}>Price (Low to High)</option>
+                        <option value="-price" {% if current_sort == "-price" %}selected{% endif %}>Price (High to Low)</option>
+                    </select>
+                </form>
+
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        {{ message }}
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            
+                <div class="d-flex justify-content-end">
+                    <div class="button-div">
+                        <button type="button" class="btn btn-primary custom-btn me-3" data-toggle="modal" data-target="#createListModal">
+                            Add Item
+                        </button>
+                        <button type="button" class="btn btn-primary custom-btn" data-toggle="modal" data-target="#addItemURL">
+                            Add Item by URL
+                        </button>
+                    </div>
+                </div>
+            </div>            
+    </div>
+
+    <!-- modal structure (with URL)-->
+    <div class="modal fade" id="addItemURL" tabindex="-1" aria-labelledby="addItemURLLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newModalLabel">Create a New Item</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="URLForm">
+                        {% csrf_token %}
+                        {{ form1.as_p }}
+                        <button type="submit" class="btn btn-primary custom-btn">Add Product</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal structure (non URL)-->
+    <div class="modal fade" id="createListModal" tabindex="-1" aria-labelledby="createListModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createListModalLabel">Create a New Item</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm" method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <button type="submit" class="btn btn-primary custom-btn">Add Product</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal structure (map)-->
+    <div class="modal fade" id="findLocation" tabindex="-1" aria-labelledby="findLocationLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newModalLabel">Find Nearest Store</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="location-info"></div>
+                    <div class="map" id="map"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br><br>
+
+    </div> 
+    
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ googlemaps_api }}&libraries=places"></script>
+
+    <script>
+        const list_id = "{{ list_id }}"
+        setInterval(getProducts(list_id), 1000);
+        getProducts(list_id)
+        const deleteItemURL = function (id) {
+            return "{% url 'delete-item' 0 %}".replace("0",id)
+        }
+    </script>
+
+    <div id="global-products-container">
+        <div id="product-list-container" class="row">
+        </div>
+        <div id="total"></div>
+    </div> 
+    <br><br>
+
+{% endblock %}
