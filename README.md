@@ -1,5 +1,4 @@
 # Smart Shopping Hub (f24_team_18)
-https://team18.cmu-webapps.com/ <br>
 Crystal Huang, Rose Liu, Erika Ramirez, Elly Zheng
 
 ## About
